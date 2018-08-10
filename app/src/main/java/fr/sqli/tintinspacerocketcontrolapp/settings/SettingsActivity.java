@@ -13,13 +13,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import fr.sqli.tintinspacerocketcontrolapp.R;
+import fr.sqli.tintinspacerocketcontrolapp.service.SpaceRocketService;
 
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String SHARED_PREF_NAME = "tintinspacerocket";
-    private static final String SERVER_URL_SHARED_PREF_KEY = "server_url";
 
-    private static String serverUrl = "http://Android.local:8888/";
+    private SpaceRocketService spaceRocketService;
 
     private EditText serverUrlEditText;
 
@@ -49,25 +49,17 @@ public class SettingsActivity extends AppCompatActivity {
     /**
      * Prépare les champs pour les saisie/test de l'url du serveur
      */
+    @SuppressWarnings("checkResult")
     private void prepareServerUrlFields() {
         serverUrlEditText = findViewById(R.id.server_url_edit_text);
 
-        final String savedServerUrl =
-                getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
-                        .getString(SERVER_URL_SHARED_PREF_KEY, null);
-
-        if (savedServerUrl != null) {
-            serverUrl = savedServerUrl;
-        }
+        spaceRocketService = SpaceRocketService.getInstance(this);
 
         // Bouton enregistrement nouvelle URL
         findViewById(R.id.modify_url_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
-                        .edit()
-                        .putString(SERVER_URL_SHARED_PREF_KEY, serverUrlEditText.getText().toString())
-                        .apply();
+                spaceRocketService.setServerUrl(serverUrlEditText.getText().toString());
                 Toast.makeText(SettingsActivity.this, "Modification URL OK", Toast.LENGTH_SHORT).show();
             }
         });
@@ -76,7 +68,15 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.test_url_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                spaceRocketService.health().subscribe(health -> {
+                    if (Boolean.TRUE.equals(health)) {
+                        Toast.makeText(SettingsActivity.this, "Test URL OK", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SettingsActivity.this, "Test URL KO !", Toast.LENGTH_SHORT).show();
+                    }
+                }, error -> {
+                    Toast.makeText(SettingsActivity.this, "Test URL KO ! (" + error.getMessage() + ")", Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
@@ -134,7 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(SettingsActivity.this, "Changement de mot de passe OK", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(SettingsActivity.this, "Création du mot de passe OK", Toast.LENGTH_SHORT).show();
-                        serverUrlEditText.setText(serverUrl);
+                        serverUrlEditText.setText(spaceRocketService.getServerUrl());
                     }
 
                 } else if (!correctPassword.equals(passwordEditText.getText().toString())) {
@@ -143,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     // Vérification du mot de passe OK
                     alertDialog.dismiss();
-                    serverUrlEditText.setText(serverUrl);
+                    serverUrlEditText.setText(spaceRocketService.getServerUrl());
                     Toast.makeText(SettingsActivity.this, "Mot de passe OK", Toast.LENGTH_SHORT).show();
                 }
             }
