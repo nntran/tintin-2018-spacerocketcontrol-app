@@ -16,6 +16,13 @@ import fr.sqli.tintinspacerocketcontrolapp.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    public static final String SHARED_PREF_NAME = "tintinspacerocket";
+    private static final String SERVER_URL_SHARED_PREF_KEY = "server_url";
+
+    private static String serverUrl = "http://Android.local:8888/";
+
+    private EditText serverUrlEditText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +32,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+
+        prepareServerUrlFields();
+
         showPasswordDialog(false);
 
         // Bouton changement du mot de passe administrateur
@@ -37,11 +47,46 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * Prépare les champs pour les saisie/test de l'url du serveur
+     */
+    private void prepareServerUrlFields() {
+        serverUrlEditText = findViewById(R.id.server_url_edit_text);
+
+        final String savedServerUrl =
+                getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+                        .getString(SERVER_URL_SHARED_PREF_KEY, null);
+
+        if (savedServerUrl != null) {
+            serverUrl = savedServerUrl;
+        }
+
+        // Bouton enregistrement nouvelle URL
+        findViewById(R.id.modify_url_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
+                        .edit()
+                        .putString(SERVER_URL_SHARED_PREF_KEY, serverUrlEditText.getText().toString())
+                        .apply();
+                Toast.makeText(SettingsActivity.this, "Modification URL OK", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Bouton test URL
+        findViewById(R.id.test_url_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
+    }
+
+    /**
      * Affiche la pop up modale pour créer/saisir/modifier le mot de passe administrateur
      * @param isEditMode indique si la pop up doit s'afficher en mode édition du mot de passe
      */
     private void showPasswordDialog(final boolean isEditMode) {
-        final String correctPassword = getSharedPreferences("tintinspacerocket", Context.MODE_PRIVATE)
+        final String correctPassword = getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
                 .getString("admin_password", null);
 
         final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -79,7 +124,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(final View v) {
                 if (correctPassword == null || isEditMode) {
                     // Création d'un nouveau mot de passe
-                    getSharedPreferences("tintinspacerocket", Context.MODE_PRIVATE)
+                    getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
                             .edit()
                             .putString("admin_password", passwordEditText.getText().toString())
                             .apply();
@@ -89,6 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(SettingsActivity.this, "Changement de mot de passe OK", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(SettingsActivity.this, "Création du mot de passe OK", Toast.LENGTH_SHORT).show();
+                        serverUrlEditText.setText(serverUrl);
                     }
 
                 } else if (!correctPassword.equals(passwordEditText.getText().toString())) {
@@ -97,6 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     // Vérification du mot de passe OK
                     alertDialog.dismiss();
+                    serverUrlEditText.setText(serverUrl);
                     Toast.makeText(SettingsActivity.this, "Mot de passe OK", Toast.LENGTH_SHORT).show();
                 }
             }
