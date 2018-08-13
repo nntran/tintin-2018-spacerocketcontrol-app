@@ -21,10 +21,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".settings.SettingsActivity">
-        </activity>
+        <activity android:name=".settings.SettingsActivity" />
+        <activity android:name=".player.ScanQRCodeActivity" />
+        <activity android:name=".player.AddPlayerActivity" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
 </manifest>
