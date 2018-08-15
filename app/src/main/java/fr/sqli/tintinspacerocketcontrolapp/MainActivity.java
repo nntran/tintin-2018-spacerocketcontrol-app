@@ -1,22 +1,25 @@
 package fr.sqli.tintinspacerocketcontrolapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.AddPlayerActivity;
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
+import fr.sqli.tintinspacerocketcontrolapp.service.SpaceRocketService;
 import fr.sqli.tintinspacerocketcontrolapp.settings.SettingsActivity;
+import retrofit2.HttpException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -102,9 +105,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("CheckResult")
     private void internalStartGame(final Player player) {
         this.currentPLayer = player;
         // TODO
-        Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
+        SpaceRocketService.getInstance(this).start(player).subscribe(start -> {
+            player.setId(start.gamerId);
+            Toast.makeText(this, "Démarrage du jeu pour " + player + " !", Toast.LENGTH_SHORT).show();
+        }, throwable -> {
+            final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+            if (throwable instanceof HttpException) {
+                final HttpException httpException = (HttpException) throwable;
+                alertDialog.setMessage(httpException.response().errorBody().string());
+            } else {
+                alertDialog.setMessage(throwable.getMessage());
+            }
+
+            alertDialog.show();
+        });
+
     }
 }

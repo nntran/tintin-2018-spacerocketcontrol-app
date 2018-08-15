@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
 
+    private int id;
     private String lastName;
     private String firstName;
     private String email;
@@ -69,9 +70,30 @@ public class Player implements Serializable {
         this.genderMale = genderMale;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public boolean isNotEmpty() {
         return firstName != null && !firstName.isEmpty()
                 && lastName != null && !lastName.isEmpty()
                 && email != null && !email.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", lastName='" + lastName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", email='" + email + '\'' +
+                ", twitter='" + twitter + '\'' +
+                ", company='" + company + '\'' +
+                ", genderMale=" + genderMale +
+                '}';
     }
 }

@@ -2,8 +2,10 @@ package fr.sqli.tintinspacerocketcontrolapp.service;
 
 import android.content.Context;
 
-import fr.sqli.tintinspacerocketcontrolapp.service.api.Health;
+import fr.sqli.tintinspacerocketcontrolapp.player.Player;
+import fr.sqli.tintinspacerocketcontrolapp.service.api.Gamer;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.SpaceRocketApi;
+import fr.sqli.tintinspacerocketcontrolapp.service.api.Start;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -86,6 +88,20 @@ public final class SpaceRocketService {
                         return Observable.just(Boolean.FALSE);
                     }
                 });
+    }
+
+    public Observable<Start> start(final Player player) {
+        final Gamer gamer = new Gamer();
+        gamer.gamerFirstname = player.getFirstName();
+        gamer.gamerLastname = player.getFirstName();
+        gamer.gamerEmail = player.getEmail();
+        gamer.gamerCompany = player.getCompany();
+        gamer.gamerTwitter = player.getTwitter();
+        gamer.gamerGenderMale = player.isGenderMale();
+
+        return spaceRocketApi.start(gamer)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 }
