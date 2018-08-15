@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -22,7 +23,9 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_NEW_PLAYER = 0;
     private ImageView scanButton;
     private ImageView addPlayerManuallyButton;
+    private ImageView playDemoButton;
     private static final int ZXING_CAMERA_PERMISSION = 1;
+    private Player currentPLayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         scanButton = findViewById(R.id.scan_button);
         addPlayerManuallyButton = findViewById(R.id.add_player_manually);
+        playDemoButton = findViewById(R.id.play_demo);
         prepareView();
     }
 
@@ -41,13 +45,24 @@ public class MainActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA}, ZXING_CAMERA_PERMISSION);
-                startActivityForResult(new Intent(this, ScanQRCodeActivity.class), REQUEST_CODE_NEW_PLAYER);
             } else {
                 startActivityForResult(new Intent(this, ScanQRCodeActivity.class), REQUEST_CODE_NEW_PLAYER);
             }
         });
+
         addPlayerManuallyButton.setOnClickListener(v -> {
             startActivityForResult(new Intent(this, AddPlayerActivity.class), REQUEST_CODE_NEW_PLAYER);
+        });
+
+        playDemoButton.setOnClickListener(v -> {
+            final Player player = new Player();
+            player.setFirstName("Utilisateur démo");
+            player.setLastName("Démo");
+            player.setCompany("Démo");
+            player.setEmail("Démo");
+            player.setGenderMale(true);
+            player.setTwitter("Démo");
+            internalStartGame(player);
         });
     }
 
@@ -80,11 +95,16 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_NEW_PLAYER && resultCode == RESULT_OK) {
             final Player player = (Player) data.getExtras().getSerializable(AddPlayerActivity.PLAYER_INFORMATION);
             if (player.isNotEmpty()) {
-                Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
-                // TODO
+                internalStartGame(player);
             } else {
                 Toast.makeText(this, "Prénom / Nom / Email obligatoires", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void internalStartGame(final Player player) {
+        this.currentPLayer = player;
+        // TODO
+        Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
     }
 }

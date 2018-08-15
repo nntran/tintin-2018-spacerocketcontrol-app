@@ -39,6 +39,17 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_person_add_black_24dp" />
 
+        <ImageButton
+            android:id="@+id/play_demo"
+            android:layout_width="72dp"
+            android:layout_height="48dp"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:minWidth="0pt"
+            android:padding="0pt"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_play_demo" />
+
     </LinearLayout>
 
 </LinearLayout>
