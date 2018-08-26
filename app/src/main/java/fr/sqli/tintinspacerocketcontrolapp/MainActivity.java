@@ -111,7 +111,16 @@ public class MainActivity extends AppCompatActivity {
         // TODO
         SpaceRocketService.getInstance(this).start(player).subscribe(start -> {
             player.setId(start.gamerId);
-            Toast.makeText(this, "Démarrage du jeu pour " + player + " !", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
+            final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setMessage("Salut " + player.getFirstName() + ", bienvenu pour le challenge DevFest SQLI 2018 !\n\nAppuie sur OK pour démarrer la partie :)")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        dialog.cancel();
+                        dialog.dismiss();
+                    }).create();
+            alertDialog.show();
+
         }, throwable -> {
             final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
@@ -122,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.setMessage(throwable.getMessage());
             }
 
+            alertDialog.setCancelable(true);
             alertDialog.show();
         });
 
