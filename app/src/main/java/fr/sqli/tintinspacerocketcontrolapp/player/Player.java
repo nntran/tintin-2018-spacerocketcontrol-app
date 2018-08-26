@@ -1,6 +1,7 @@
 package fr.sqli.tintinspacerocketcontrolapp.player;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by renaud on 16/06/17.
@@ -15,6 +16,8 @@ public class Player implements Serializable {
     private String twitter;
     private String company;
     private boolean genderMale = true;
+
+    public String[] sequence;
 
     public Player() {
     }
@@ -75,6 +78,14 @@ public class Player implements Serializable {
         this.id = id;
     }
 
+    public String[] getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(String[] sequence) {
+        this.sequence = sequence;
+    }
+
     public boolean isNotEmpty() {
         return firstName != null && !firstName.isEmpty()
                 && lastName != null && !lastName.isEmpty()
@@ -91,6 +102,7 @@ public class Player implements Serializable {
                 ", twitter='" + twitter + '\'' +
                 ", company='" + company + '\'' +
                 ", genderMale=" + genderMale +
+                ", sequence=" + Arrays.toString(sequence) +
                 '}';
     }
 }

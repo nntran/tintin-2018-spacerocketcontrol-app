@@ -4,6 +4,7 @@ import android.content.Context;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.Gamer;
+import fr.sqli.tintinspacerocketcontrolapp.service.api.Play;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.SpaceRocketApi;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.Start;
 import io.reactivex.Observable;
@@ -100,6 +101,13 @@ public final class SpaceRocketService {
         gamer.gamerGenderMale = player.isGenderMale();
 
         return spaceRocketApi.start(gamer)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Play> play(final Player player) {
+
+        return spaceRocketApi.play(player.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

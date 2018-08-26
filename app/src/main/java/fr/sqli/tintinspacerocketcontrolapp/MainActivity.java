@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import fr.sqli.tintinspacerocketcontrolapp.player.AddPlayerActivity;
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
@@ -96,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_NEW_PLAYER && resultCode == RESULT_OK) {
-            final Player player = (Player) data.getExtras().getSerializable(AddPlayerActivity.PLAYER_INFORMATION);
-            if (player.isNotEmpty()) {
-                internalStartGame(player);
+            currentPLayer = (Player) data.getExtras().getSerializable(AddPlayerActivity.PLAYER_INFORMATION);
+            if (currentPLayer.isNotEmpty()) {
+                internalStartGame(currentPLayer);
             } else {
                 Toast.makeText(this, "Prénom / Nom / Email obligatoires", Toast.LENGTH_SHORT).show();
             }
@@ -118,22 +120,40 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("OK", (dialog, which) -> {
                         dialog.cancel();
                         dialog.dismiss();
+
+                        // TODO cacher les boutons en haut
+                        internalPlayGame(player);
+
                     }).create();
             alertDialog.show();
 
         }, throwable -> {
-            final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-
-            if (throwable instanceof HttpException) {
-                final HttpException httpException = (HttpException) throwable;
-                alertDialog.setMessage(httpException.response().errorBody().string());
-            } else {
-                alertDialog.setMessage(throwable.getMessage());
-            }
-
-            alertDialog.setCancelable(true);
-            alertDialog.show();
+            internalManageServiceHttpException(throwable);
         });
 
+    }
+
+    @SuppressLint("CheckResult")
+    private void internalPlayGame(final Player player) {
+        SpaceRocketService.getInstance(this).play(player).subscribe(play-> {
+            currentPLayer.setSequence(play.sequence);
+            // TODO gérer les actions IHM des appuies de bouton
+        }, throwable -> {
+            internalManageServiceHttpException(throwable);
+        });
+    }
+
+    private void internalManageServiceHttpException(Throwable throwable) throws IOException {
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+        if (throwable instanceof HttpException) {
+            final HttpException httpException = (HttpException) throwable;
+            alertDialog.setMessage(httpException.response().errorBody().string());
+        } else {
+            alertDialog.setMessage(throwable.getMessage());
+        }
+
+        alertDialog.setCancelable(true);
+        alertDialog.show();
     }
 }

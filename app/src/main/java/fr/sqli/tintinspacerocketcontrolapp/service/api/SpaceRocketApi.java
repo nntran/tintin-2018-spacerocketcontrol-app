@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface SpaceRocketApi {
 
@@ -13,4 +14,7 @@ public interface SpaceRocketApi {
 
     @POST("/simon/start")
     Observable<Start> start(@Body final Gamer gamer);
+
+    @POST("/simon/{id}/play")
+    Observable<Play> play(@Path("id") final int gamerId);
 }
