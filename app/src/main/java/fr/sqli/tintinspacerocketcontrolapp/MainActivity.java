@@ -9,16 +9,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Date;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.AddPlayerActivity;
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
+import fr.sqli.tintinspacerocketcontrolapp.pojos.CurrentTry;
+import fr.sqli.tintinspacerocketcontrolapp.service.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.service.pojos.Colors;
 import fr.sqli.tintinspacerocketcontrolapp.service.SpaceRocketService;
 import fr.sqli.tintinspacerocketcontrolapp.settings.SettingsActivity;
 import retrofit2.HttpException;
@@ -26,11 +31,14 @@ import retrofit2.HttpException;
 public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_NEW_PLAYER = 0;
+    public static final String TAG = MainActivity.class.getName();
     private ImageView scanButton;
     private ImageView addPlayerManuallyButton;
     private ImageView playDemoButton;
     private static final int ZXING_CAMERA_PERMISSION = 1;
     private Player currentPLayer;
+    private CurrentTry currentTry = null;
+    private Date startTryDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +77,74 @@ public class MainActivity extends AppCompatActivity {
             player.setTwitter("Démo");
             internalStartGame(player);
         });
+
+        prepareSimonButtons();
     }
+
+
+    private void prepareSimonButtons() {
+        findViewById(R.id.blue_button).setOnClickListener(v -> {
+            internalSimonGameButtonOnClick(Colors.BLUE);
+        });
+        findViewById(R.id.red_button).setOnClickListener(v -> {
+            internalSimonGameButtonOnClick(Colors.RED);
+        });
+        findViewById(R.id.yellow_button).setOnClickListener(v -> {
+            internalSimonGameButtonOnClick(Colors.YELLOW);
+        });
+        findViewById(R.id.green_button).setOnClickListener(v -> {
+            internalSimonGameButtonOnClick(Colors.GREEN);
+        });
+    }
+
+    private void internalSimonGameButtonOnClick(final Colors color) {
+        if (currentTry != null) {
+            if (currentTry.isPlayerTrying) {
+                // Essai en cours
+                if (currentTry.startDate == null) {
+                    Log.d(TAG, "Nouvelle tentative");
+                    // 1ère couleur de la séquence
+                    currentTry.startDate = new Date();
+                } else {
+                    Log.d(TAG, "Tentative en cours");
+                }
+
+                currentTry.tryingSequence.add(color);
+
+                if (currentTry.tryingSequence.size() == currentTry.correctSequence.size()) {
+                    Log.d(TAG, "Tentative terminée");
+                    // Fin de la séquence
+                    currentTry.isPlayerTrying = false;
+                    currentTry.time = new Date().getTime() - currentTry.startDate.getTime();
+                    // Tentative
+                    internalTrySequence();
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private void internalTrySequence() {
+        Log.d(TAG, "Tentative de séquence");
+        SpaceRocketService.getInstance(this)
+                .trySequence(currentPLayer, currentTry.tryingSequence, currentTry.time).subscribe(tryResult -> {
+            Log.d(TAG, "Résultat tentative : " + tryResult.result);
+            if (tryResult.result == false) {
+                // Essai KO : nouvel essai
+                currentTry.remainingAttemps = tryResult.remainingAttempts;
+                currentTry.isPlayerTrying = true;
+                currentTry.tryingSequence.clear();
+                currentTry.startDate = null;
+                Toast.makeText(this, "Essai KO : " + currentTry.remainingAttemps  + " tentative(s) restante(s)", Toast.LENGTH_SHORT).show();
+            } else {
+                // Essai OK : séquence suivante
+                internalPlayGame(currentPLayer);
+            }
+        }, throwable -> {
+            internalManageServiceHttpException(throwable);
+        });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,9 +184,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void internalStartGame(final Player player) {
-        this.currentPLayer = player;
-        // TODO
         SpaceRocketService.getInstance(this).start(player).subscribe(start -> {
+            this.currentPLayer = player;
             player.setId(start.gamerId);
             // Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
             final AlertDialog alertDialog = new AlertDialog.Builder(this)
@@ -121,8 +195,7 @@ public class MainActivity extends AppCompatActivity {
                         dialog.cancel();
                         dialog.dismiss();
 
-                        // TODO cacher les boutons en haut
-                        internalPlayGame(player);
+                        this.internalPlayGame(player);
 
                     }).create();
             alertDialog.show();
@@ -135,25 +208,49 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void internalPlayGame(final Player player) {
-        SpaceRocketService.getInstance(this).play(player).subscribe(play-> {
-            currentPLayer.setSequence(play.sequence);
-            // TODO gérer les actions IHM des appuies de bouton
+        SpaceRocketService.getInstance(this).play(player).subscribe(playResult -> {
+            Log.d(TAG, "Nouvelle séquence affichée, au tour du joueur");
+
+            findViewById(R.id.scan_button).setEnabled(false);
+            findViewById(R.id.add_player_manually).setEnabled(false);
+            findViewById(R.id.play_demo).setEnabled(false);
+
+            // TODO afficher bouton stop
+
+            this.currentTry = new CurrentTry();
+            currentTry.correctSequence = playResult.correctSequence;
+            currentTry.remainingAttemps = playResult.remainingAttempts;
+            currentTry.isPlayerTrying = true;
+
         }, throwable -> {
             internalManageServiceHttpException(throwable);
         });
     }
 
     private void internalManageServiceHttpException(Throwable throwable) throws IOException {
-        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-
-        if (throwable instanceof HttpException) {
+        String message;
+        if (throwable instanceof GameFinishedException) {
+            // TODO Récupération du score
+            findViewById(R.id.scan_button).setEnabled(true);
+            findViewById(R.id.add_player_manually).setEnabled(true);
+            findViewById(R.id.play_demo).setEnabled(true);
+            currentTry = null;
+            currentPLayer = null;
+            message = "Partie terminée ! \n\n Ton score est de TODO (temps total TODO)";
+        } else if (throwable instanceof HttpException) {
             final HttpException httpException = (HttpException) throwable;
-            alertDialog.setMessage(httpException.response().errorBody().string());
+            message = "Exception HTTP \n" + httpException.getMessage() + "\n" + httpException.response().errorBody().string();
         } else {
-            alertDialog.setMessage(throwable.getMessage());
+            message = throwable.getMessage();
         }
 
-        alertDialog.setCancelable(true);
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                    dialog.dismiss();
+                }).create();
         alertDialog.show();
     }
 }

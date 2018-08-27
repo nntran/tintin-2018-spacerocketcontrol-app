@@ -1,15 +1,25 @@
 package fr.sqli.tintinspacerocketcontrolapp.service;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.Gamer;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.Play;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.SpaceRocketApi;
 import fr.sqli.tintinspacerocketcontrolapp.service.api.Start;
+import fr.sqli.tintinspacerocketcontrolapp.service.api.TryBody;
+import fr.sqli.tintinspacerocketcontrolapp.service.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.service.pojos.PlayResult;
+import fr.sqli.tintinspacerocketcontrolapp.service.pojos.Colors;
+import fr.sqli.tintinspacerocketcontrolapp.service.pojos.TryResult;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -105,11 +115,67 @@ public final class SpaceRocketService {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Play> play(final Player player) {
+    public Observable<PlayResult> play(final Player player) {
+        // TODO Gérer exception jeu terminé
+        return spaceRocketApi.play(player.getId()).flatMap(play -> {
+            final PlayResult playResult = new PlayResult();
+            playResult.correctSequence = convertColorsCodesArrayToColorsList(play.sequence);
+            playResult.remainingAttempts = play.remainingAttempts;
 
-        return spaceRocketApi.play(player.getId())
+            return Observable.just(playResult);
+        })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<TryResult> trySequence(final Player player, final List<Colors> sequenceTried, final long time) {
+        final TryBody tryBody = new TryBody();
+        tryBody.time = time;
+        tryBody.sequence = convertLEDColorsListToArray(sequenceTried);
+
+        // TODO Gérer exception jeu terminé
+        return spaceRocketApi.trySequence(player.getId(), tryBody).flatMap(tryResponse -> {
+            TryResult result = new TryResult();
+            result.remainingAttempts = tryResponse.remainingAttempts;
+            result.result = tryResponse.result;
+            return Observable.just(result);
+        }).onErrorResumeNext(throwable -> {
+            if (throwable instanceof HttpException) {
+                final HttpException httpException = (HttpException) throwable;
+                if (httpException.code() == 403) {
+                    return Observable.error(new GameFinishedException());
+                } else {
+                    return Observable.error(throwable);
+                }
+            } else {
+                return Observable.error(throwable);
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    @NonNull
+    private String[] convertLEDColorsListToArray(List<Colors> sequence) {
+        String[] ledColors = new String[sequence.size()];
+        for (int i = 0; i < sequence.size(); i++) {
+            ledColors[i] = sequence.get(i).code;
+        }
+        return ledColors;
+    }
+
+    @NonNull
+    private List<Colors> convertColorsCodesArrayToColorsList(String[] sequence) throws Exception {
+        final List<Colors> colors = new LinkedList<>();
+
+        for (int i= 0; i < sequence.length; i++) {
+            Colors colorByCode = Colors.getByCode(sequence[i]);
+            if (colorByCode == null) {
+                throw new Exception("Color envoyée non reconnue !");
+            }
+            colors.add(colorByCode);
+        }
+        return colors;
     }
 
 }

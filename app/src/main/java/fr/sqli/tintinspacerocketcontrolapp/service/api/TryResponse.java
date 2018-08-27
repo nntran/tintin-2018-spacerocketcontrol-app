@@ -1,9 +1,7 @@
 package fr.sqli.tintinspacerocketcontrolapp.service.api;
 
-public class Play {
-    public String[] sequence;
-
+public class TryResponse {
     public int remainingAttempts;
-
-    public String message;
+    public String[] sequence;
+    public boolean result;
 }
