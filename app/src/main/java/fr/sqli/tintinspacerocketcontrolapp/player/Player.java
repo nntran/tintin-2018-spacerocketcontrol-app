@@ -16,6 +16,7 @@ public class Player implements Serializable {
     private String twitter;
     private String company;
     private boolean contact = true;
+    private boolean resume = false;
 
     public Player() {
     }
@@ -82,6 +83,14 @@ public class Player implements Serializable {
                 && email != null && !email.isEmpty();
     }
 
+    public boolean isResume() {
+        return resume;
+    }
+
+    public void setResume(boolean resume) {
+        this.resume = resume;
+    }
+
     @Override
     public String toString() {
         return "Player{" +
@@ -92,7 +101,7 @@ public class Player implements Serializable {
                 ", twitter='" + twitter + '\'' +
                 ", company='" + company + '\'' +
                 ", contact=" + contact +
+                ", resume=" + resume +
                 '}';
     }
-
 }

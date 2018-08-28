@@ -188,9 +188,15 @@ public class MainActivity extends AppCompatActivity {
         SimonService.getInstance(this).start(player).subscribe(start -> {
             this.currentPlayer = player;
             player.setId(start.gamerId);
-            // Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
+            player.setResume(start.gamerResume);
+
+            String message = "Salut " + player.getFirstName() + ", bienvenu pour le challenge DevFest SQLI 2018 !\n\nAppuie sur OK pour démarrer la partie :)";
+            if (player.isResume()) {
+                message = "Salut " + player.getFirstName() + ", (re)bienvenu pour le challenge DevFest SQLI 2018 !\n\nAppuie sur OK pour reprendre ta partie :)";
+            }
+
             final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setMessage("Salut " + player.getFirstName() + ", bienvenu pour le challenge DevFest SQLI 2018 !\n\nAppuie sur OK pour démarrer la partie :)")
+                    .setMessage(message)
                     .setCancelable(false)
                     .setPositiveButton("OK", (dialog, which) -> {
                         dialog.cancel();
@@ -261,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
         if (throwable instanceof GameFinishedException) {
             internalGetScore(alertDialog);
         } else if (throwable instanceof PlayerAlreadyPlayedException) {
+            currentPlayer.setId(((PlayerAlreadyPlayedException) throwable).gamerId);
             internalGetScore(alertDialog);
         } else if (throwable instanceof HttpException) {
             final HttpException httpException = (HttpException) throwable;
