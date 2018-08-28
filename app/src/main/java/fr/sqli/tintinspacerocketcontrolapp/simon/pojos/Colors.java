@@ -1,4 +1,4 @@
-package fr.sqli.tintinspacerocketcontrolapp.service.pojos;
+package fr.sqli.tintinspacerocketcontrolapp.simon.pojos;
 
 public enum Colors {
     BLUE(Codes.BLUE),

@@ -1,4 +1,4 @@
-package fr.sqli.tintinspacerocketcontrolapp.service.api;
+package fr.sqli.tintinspacerocketcontrolapp.simon.api;
 
 import io.reactivex.Observable;
 import retrofit2.http.Body;

@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import fr.sqli.tintinspacerocketcontrolapp.service.pojos.Colors;
+import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
 
 public class CurrentTry {
     public List<Colors> tryingSequence = new LinkedList<>();

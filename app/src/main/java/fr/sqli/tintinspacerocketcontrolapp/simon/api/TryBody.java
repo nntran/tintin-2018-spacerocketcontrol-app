@@ -1,4 +1,4 @@
-package fr.sqli.tintinspacerocketcontrolapp.service.api;
+package fr.sqli.tintinspacerocketcontrolapp.simon.api;
 
 public class TryBody {
     public String[] sequence;

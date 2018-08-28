@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import fr.sqli.tintinspacerocketcontrolapp.R;
-import fr.sqli.tintinspacerocketcontrolapp.service.SpaceRocketService;
+import fr.sqli.tintinspacerocketcontrolapp.simon.SpaceRocketService;
 
 public class SettingsActivity extends AppCompatActivity {
 

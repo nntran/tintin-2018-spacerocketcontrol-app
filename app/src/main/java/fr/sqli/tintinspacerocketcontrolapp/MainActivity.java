@@ -22,9 +22,9 @@ import fr.sqli.tintinspacerocketcontrolapp.player.AddPlayerActivity;
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
 import fr.sqli.tintinspacerocketcontrolapp.pojos.CurrentTry;
-import fr.sqli.tintinspacerocketcontrolapp.service.ex.GameFinishedException;
-import fr.sqli.tintinspacerocketcontrolapp.service.pojos.Colors;
-import fr.sqli.tintinspacerocketcontrolapp.service.SpaceRocketService;
+import fr.sqli.tintinspacerocketcontrolapp.simon.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
+import fr.sqli.tintinspacerocketcontrolapp.simon.SpaceRocketService;
 import fr.sqli.tintinspacerocketcontrolapp.settings.SettingsActivity;
 import retrofit2.HttpException;
 
@@ -228,6 +228,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void internalManageServiceHttpException(Throwable throwable) throws IOException {
+        // TODO gérer problèmes de connexion (débloquer la partie)
+
         String message;
         if (throwable instanceof GameFinishedException) {
             // TODO Récupération du score

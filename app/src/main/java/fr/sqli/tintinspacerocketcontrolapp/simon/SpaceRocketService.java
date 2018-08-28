@@ -1,4 +1,4 @@
-package fr.sqli.tintinspacerocketcontrolapp.service;
+package fr.sqli.tintinspacerocketcontrolapp.simon;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,15 +7,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
-import fr.sqli.tintinspacerocketcontrolapp.service.api.Gamer;
-import fr.sqli.tintinspacerocketcontrolapp.service.api.Play;
-import fr.sqli.tintinspacerocketcontrolapp.service.api.SpaceRocketApi;
-import fr.sqli.tintinspacerocketcontrolapp.service.api.Start;
-import fr.sqli.tintinspacerocketcontrolapp.service.api.TryBody;
-import fr.sqli.tintinspacerocketcontrolapp.service.ex.GameFinishedException;
-import fr.sqli.tintinspacerocketcontrolapp.service.pojos.PlayResult;
-import fr.sqli.tintinspacerocketcontrolapp.service.pojos.Colors;
-import fr.sqli.tintinspacerocketcontrolapp.service.pojos.TryResult;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.Gamer;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.SpaceRocketApi;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.Start;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.TryBody;
+import fr.sqli.tintinspacerocketcontrolapp.simon.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.PlayResult;
+import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
+import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.TryResult;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
