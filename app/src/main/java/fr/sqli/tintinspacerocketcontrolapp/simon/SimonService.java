@@ -3,16 +3,21 @@ package fr.sqli.tintinspacerocketcontrolapp.simon;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Gamer;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.GenericKoResponse;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Score;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.SpaceRocketApi;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Start;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.TryBody;
 import fr.sqli.tintinspacerocketcontrolapp.simon.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.simon.ex.PlayerAlreadyPlayedException;
 import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.PlayResult;
 import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
 import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.TryResult;
@@ -37,6 +42,8 @@ public final class SimonService {
     private static final String SERVER_URL_SHARED_PREF_KEY = "server_url";
 
     private String serverUrl = "http://Android.local:8888/";
+
+    private JsonAdapter<GenericKoResponse> genericKoResponseJsonAdapter;
 
     private SimonService(final Context context) {
         this.context = context;
@@ -81,6 +88,8 @@ public final class SimonService {
     }
 
     private void initSpaceRocketApi() {
+        genericKoResponseJsonAdapter = new Moshi.Builder().build().adapter(GenericKoResponse.class);
+
         spaceRocketApi = new Retrofit.Builder()
                 .baseUrl(serverUrl)
                 .addConverterFactory(MoshiConverterFactory.create())
@@ -111,6 +120,19 @@ public final class SimonService {
         gamer.gamerContact = player.isContact();
 
         return spaceRocketApi.start(gamer)
+                .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof HttpException) {
+                        final HttpException httpException = (HttpException) throwable;
+                        if (httpException.code() == 403) {
+                            GenericKoResponse genericKoResponse = genericKoResponseJsonAdapter.fromJson(httpException.response().errorBody().string());
+                            return Observable.error(new PlayerAlreadyPlayedException(genericKoResponse.gamerId));
+                        } else {
+                            return Observable.error(throwable);
+                        }
+                    } else {
+                        return Observable.error(throwable);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

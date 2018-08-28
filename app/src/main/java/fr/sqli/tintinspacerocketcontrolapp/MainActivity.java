@@ -23,6 +23,7 @@ import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
 import fr.sqli.tintinspacerocketcontrolapp.pojos.CurrentTry;
 import fr.sqli.tintinspacerocketcontrolapp.simon.ex.GameFinishedException;
+import fr.sqli.tintinspacerocketcontrolapp.simon.ex.PlayerAlreadyPlayedException;
 import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
 import fr.sqli.tintinspacerocketcontrolapp.simon.SimonService;
 import fr.sqli.tintinspacerocketcontrolapp.settings.SettingsActivity;
@@ -227,7 +228,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     @SuppressLint("CheckResult")
+    private void internalGetScore(AlertDialog alertDialog) {
+        // TODO Récupération du score
+        findViewById(R.id.scan_button).setEnabled(true);
+        findViewById(R.id.add_player_manually).setEnabled(true);
+        findViewById(R.id.play_demo).setEnabled(true);
+        SimonService.getInstance(this).getScore(currentPlayer).subscribe(score -> {
+            final String message = "Partie terminée ! \n\n Ton score est de " + score.score + " (temps total " + score.time +")";
+            alertDialog.setMessage(message);
+            alertDialog.show();
+        }, throwable1 -> {
+            internalManageServiceHttpException(throwable1);
+        });
+
+        currentTry = null;
+        currentPlayer = null;
+    }
+
     private void internalManageServiceHttpException(Throwable throwable) throws IOException {
         // TODO gérer problèmes de connexion (débloquer la partie)
 
@@ -240,21 +259,9 @@ public class MainActivity extends AppCompatActivity {
                 }).create();
 
         if (throwable instanceof GameFinishedException) {
-            // TODO Récupération du score
-            findViewById(R.id.scan_button).setEnabled(true);
-            findViewById(R.id.add_player_manually).setEnabled(true);
-            findViewById(R.id.play_demo).setEnabled(true);
-            SimonService.getInstance(this).getScore(currentPlayer).subscribe(score -> {
-                final String message = "Partie terminée ! \n\n Ton score est de " + score.score + " (temps total " + score.time +")";
-                alertDialog.setMessage(message);
-                alertDialog.show();
-            }, throwable1 -> {
-                internalManageServiceHttpException(throwable1);
-            });
-
-            currentTry = null;
-            currentPlayer = null;
-
+            internalGetScore(alertDialog);
+        } else if (throwable instanceof PlayerAlreadyPlayedException) {
+            internalGetScore(alertDialog);
         } else if (throwable instanceof HttpException) {
             final HttpException httpException = (HttpException) throwable;
             final String message = "Exception HTTP \n" + httpException.getMessage() + "\n" + httpException.response().errorBody().string();
@@ -266,4 +273,5 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         }
     }
+
 }
