@@ -19,4 +19,7 @@ public interface SpaceRocketApi {
 
     @POST("/simon/{id}/try")
     Observable<TryResponse> trySequence(@Path("id") final int gamerId, @Body final TryBody tryBody);
+
+    @GET("/simon/{id}/score")
+    Observable<Score> getScore(@Path("id") final int gamerId);
 }

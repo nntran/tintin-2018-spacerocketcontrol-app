@@ -8,6 +8,7 @@ import java.util.List;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Gamer;
+import fr.sqli.tintinspacerocketcontrolapp.simon.api.Score;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.SpaceRocketApi;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Start;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.TryBody;
@@ -150,6 +151,12 @@ public final class SimonService {
                 return Observable.error(throwable);
             }
         })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Score> getScore(final Player player) {
+        return spaceRocketApi.getScore(player.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

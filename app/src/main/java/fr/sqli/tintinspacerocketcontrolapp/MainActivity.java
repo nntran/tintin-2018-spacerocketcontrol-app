@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView addPlayerManuallyButton;
     private ImageView playDemoButton;
     private static final int ZXING_CAMERA_PERMISSION = 1;
-    private Player currentPLayer;
+    private Player currentPlayer;
     private CurrentTry currentTry = null;
     private Date startTryDate = null;
 
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
     private void internalTrySequence() {
         Log.d(TAG, "Tentative de séquence");
         SimonService.getInstance(this)
-                .trySequence(currentPLayer, currentTry.tryingSequence, currentTry.time).subscribe(tryResult -> {
+                .trySequence(currentPlayer, currentTry.tryingSequence, currentTry.time).subscribe(tryResult -> {
             Log.d(TAG, "Résultat tentative : " + tryResult.result);
             if (tryResult.result == false) {
                 // Essai KO : nouvel essai
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Essai KO : " + currentTry.remainingAttemps  + " tentative(s) restante(s)", Toast.LENGTH_SHORT).show();
             } else {
                 // Essai OK : séquence suivante
-                internalPlayGame(currentPLayer);
+                internalPlayGame(currentPlayer);
             }
         }, throwable -> {
             internalManageServiceHttpException(throwable);
@@ -173,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_NEW_PLAYER && resultCode == RESULT_OK) {
-            currentPLayer = (Player) data.getExtras().getSerializable(AddPlayerActivity.PLAYER_INFORMATION);
-            if (currentPLayer.isNotEmpty()) {
-                internalStartGame(currentPLayer);
+            currentPlayer = (Player) data.getExtras().getSerializable(AddPlayerActivity.PLAYER_INFORMATION);
+            if (currentPlayer.isNotEmpty()) {
+                internalStartGame(currentPlayer);
             } else {
                 Toast.makeText(this, "Prénom / Nom / Email obligatoires", Toast.LENGTH_SHORT).show();
             }
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("CheckResult")
     private void internalStartGame(final Player player) {
         SimonService.getInstance(this).start(player).subscribe(start -> {
-            this.currentPLayer = player;
+            this.currentPlayer = player;
             player.setId(start.gamerId);
             // Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
             final AlertDialog alertDialog = new AlertDialog.Builder(this)
@@ -227,32 +227,43 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("CheckResult")
     private void internalManageServiceHttpException(Throwable throwable) throws IOException {
         // TODO gérer problèmes de connexion (débloquer la partie)
 
-        String message;
-        if (throwable instanceof GameFinishedException) {
-            // TODO Récupération du score
-            findViewById(R.id.scan_button).setEnabled(true);
-            findViewById(R.id.add_player_manually).setEnabled(true);
-            findViewById(R.id.play_demo).setEnabled(true);
-            currentTry = null;
-            currentPLayer = null;
-            message = "Partie terminée ! \n\n Ton score est de TODO (temps total TODO)";
-        } else if (throwable instanceof HttpException) {
-            final HttpException httpException = (HttpException) throwable;
-            message = "Exception HTTP \n" + httpException.getMessage() + "\n" + httpException.response().errorBody().string();
-        } else {
-            message = throwable.getMessage();
-        }
 
         final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setMessage(message)
                 .setCancelable(false)
                 .setPositiveButton("OK", (dialog, which) -> {
                     dialog.cancel();
                     dialog.dismiss();
                 }).create();
-        alertDialog.show();
+
+        if (throwable instanceof GameFinishedException) {
+            // TODO Récupération du score
+            findViewById(R.id.scan_button).setEnabled(true);
+            findViewById(R.id.add_player_manually).setEnabled(true);
+            findViewById(R.id.play_demo).setEnabled(true);
+            SimonService.getInstance(this).getScore(currentPlayer).subscribe(score -> {
+                final String message = "Partie terminée ! \n\n Ton score est de " + score.score + " (temps total " + score.time +")";
+                alertDialog.setMessage(message);
+                alertDialog.show();
+            }, throwable1 -> {
+                internalManageServiceHttpException(throwable1);
+            });
+
+            currentTry = null;
+            currentPlayer = null;
+
+        } else if (throwable instanceof HttpException) {
+            final HttpException httpException = (HttpException) throwable;
+            final String message = "Exception HTTP \n" + httpException.getMessage() + "\n" + httpException.response().errorBody().string();
+            alertDialog.setMessage(message);
+            alertDialog.show();
+        } else {
+            final String message = throwable.getMessage();
+            alertDialog.setMessage(message);
+            alertDialog.show();
+        }
     }
 }
