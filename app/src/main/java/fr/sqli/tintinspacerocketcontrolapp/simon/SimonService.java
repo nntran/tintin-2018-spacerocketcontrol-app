@@ -26,9 +26,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 /**
  * Singleton permettant d'appeler les APIs Rest de la Fusée
  */
-public final class SpaceRocketService {
+public final class SimonService {
 
-    private static SpaceRocketService INSTANCE;
+    private static SimonService INSTANCE;
     private SpaceRocketApi spaceRocketApi;
     private Context context;
 
@@ -37,7 +37,7 @@ public final class SpaceRocketService {
 
     private String serverUrl = "http://Android.local:8888/";
 
-    private SpaceRocketService(final Context context) {
+    private SimonService(final Context context) {
         this.context = context;
 
         final String savedServerUrl =
@@ -56,9 +56,9 @@ public final class SpaceRocketService {
      * @param context
      * @return
      */
-    public final static SpaceRocketService getInstance(final Context context) {
+    public final static SimonService getInstance(final Context context) {
         if (INSTANCE == null) {
-            INSTANCE = new SpaceRocketService(context);
+            INSTANCE = new SimonService(context);
         }
 
         return INSTANCE;

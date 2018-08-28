@@ -24,7 +24,7 @@ import fr.sqli.tintinspacerocketcontrolapp.player.ScanQRCodeActivity;
 import fr.sqli.tintinspacerocketcontrolapp.pojos.CurrentTry;
 import fr.sqli.tintinspacerocketcontrolapp.simon.ex.GameFinishedException;
 import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.Colors;
-import fr.sqli.tintinspacerocketcontrolapp.simon.SpaceRocketService;
+import fr.sqli.tintinspacerocketcontrolapp.simon.SimonService;
 import fr.sqli.tintinspacerocketcontrolapp.settings.SettingsActivity;
 import retrofit2.HttpException;
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("CheckResult")
     private void internalTrySequence() {
         Log.d(TAG, "Tentative de séquence");
-        SpaceRocketService.getInstance(this)
+        SimonService.getInstance(this)
                 .trySequence(currentPLayer, currentTry.tryingSequence, currentTry.time).subscribe(tryResult -> {
             Log.d(TAG, "Résultat tentative : " + tryResult.result);
             if (tryResult.result == false) {
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void internalStartGame(final Player player) {
-        SpaceRocketService.getInstance(this).start(player).subscribe(start -> {
+        SimonService.getInstance(this).start(player).subscribe(start -> {
             this.currentPLayer = player;
             player.setId(start.gamerId);
             // Toast.makeText(this, "Démarrage du jeu pour " + player.getFirstName() + " !", Toast.LENGTH_SHORT).show();
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void internalPlayGame(final Player player) {
-        SpaceRocketService.getInstance(this).play(player).subscribe(playResult -> {
+        SimonService.getInstance(this).play(player).subscribe(playResult -> {
             Log.d(TAG, "Nouvelle séquence affichée, au tour du joueur");
 
             findViewById(R.id.scan_button).setEnabled(false);

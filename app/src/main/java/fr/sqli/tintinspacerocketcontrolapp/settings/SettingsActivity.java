@@ -13,13 +13,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import fr.sqli.tintinspacerocketcontrolapp.R;
-import fr.sqli.tintinspacerocketcontrolapp.simon.SpaceRocketService;
+import fr.sqli.tintinspacerocketcontrolapp.simon.SimonService;
 
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String SHARED_PREF_NAME = "tintinspacerocket";
 
-    private SpaceRocketService spaceRocketService;
+    private SimonService simonService;
 
     private EditText serverUrlEditText;
 
@@ -53,13 +53,13 @@ public class SettingsActivity extends AppCompatActivity {
     private void prepareServerUrlFields() {
         serverUrlEditText = findViewById(R.id.server_url_edit_text);
 
-        spaceRocketService = SpaceRocketService.getInstance(this);
+        simonService = SimonService.getInstance(this);
 
         // Bouton enregistrement nouvelle URL
         findViewById(R.id.modify_url_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                spaceRocketService.setServerUrl(serverUrlEditText.getText().toString());
+                simonService.setServerUrl(serverUrlEditText.getText().toString());
                 Toast.makeText(SettingsActivity.this, "Modification URL OK", Toast.LENGTH_SHORT).show();
             }
         });
@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.test_url_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                spaceRocketService.health().subscribe(health -> {
+                simonService.health().subscribe(health -> {
                     if (Boolean.TRUE.equals(health)) {
                         Toast.makeText(SettingsActivity.this, "Test URL OK", Toast.LENGTH_SHORT).show();
                     } else {
@@ -134,7 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(SettingsActivity.this, "Changement de mot de passe OK", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(SettingsActivity.this, "Création du mot de passe OK", Toast.LENGTH_SHORT).show();
-                        serverUrlEditText.setText(spaceRocketService.getServerUrl());
+                        serverUrlEditText.setText(simonService.getServerUrl());
                     }
 
                 } else if (!correctPassword.equals(passwordEditText.getText().toString())) {
@@ -143,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     // Vérification du mot de passe OK
                     alertDialog.dismiss();
-                    serverUrlEditText.setText(spaceRocketService.getServerUrl());
+                    serverUrlEditText.setText(simonService.getServerUrl());
                     Toast.makeText(SettingsActivity.this, "Mot de passe OK", Toast.LENGTH_SHORT).show();
                 }
             }
