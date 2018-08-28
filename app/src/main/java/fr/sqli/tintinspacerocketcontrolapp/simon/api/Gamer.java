@@ -7,5 +7,5 @@ public class Gamer {
     public String gamerEmail;
     public String gamerCompany;
     public String gamerTwitter;
-    public boolean gamerGenderMale;
+    public boolean gamerContact;
 }

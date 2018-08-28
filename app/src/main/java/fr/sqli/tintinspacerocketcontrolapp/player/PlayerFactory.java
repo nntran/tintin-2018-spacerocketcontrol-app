@@ -4,7 +4,6 @@ import java.util.List;
 
 import ezvcard.VCard;
 import ezvcard.property.Email;
-import ezvcard.property.Gender;
 import ezvcard.property.Organization;
 import ezvcard.property.StructuredName;
 import it.auron.library.mecard.MeCard;
@@ -31,11 +30,6 @@ public class PlayerFactory {
             Organization organizations = vCard.getOrganization();
             if(organizations != null && organizations.getValues() != null && organizations.getValues().size() > 0){
                 player.setCompany(organizations.getValues().get(0));
-            }
-
-            Gender gender = vCard.getGender();
-            if(gender != null){
-                player.setGenderMale(gender.isMale());
             }
         }
         return player;

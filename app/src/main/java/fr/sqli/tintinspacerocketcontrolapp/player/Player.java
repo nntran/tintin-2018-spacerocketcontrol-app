@@ -15,7 +15,7 @@ public class Player implements Serializable {
     private String email;
     private String twitter;
     private String company;
-    private boolean genderMale = true;
+    private boolean contact = true;
 
     public Player() {
     }
@@ -60,12 +60,12 @@ public class Player implements Serializable {
         this.company = company;
     }
 
-    public boolean isGenderMale() {
-        return genderMale;
+    public boolean isContact() {
+        return contact;
     }
 
-    public void setGenderMale(boolean genderMale) {
-        this.genderMale = genderMale;
+    public void setContact(boolean contact) {
+        this.contact = contact;
     }
 
     public int getId() {
@@ -91,7 +91,8 @@ public class Player implements Serializable {
                 ", email='" + email + '\'' +
                 ", twitter='" + twitter + '\'' +
                 ", company='" + company + '\'' +
-                ", genderMale=" + genderMale +
+                ", contact=" + contact +
                 '}';
     }
+
 }

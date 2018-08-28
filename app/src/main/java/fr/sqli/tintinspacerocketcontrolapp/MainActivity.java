@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             player.setLastName("Démo");
             player.setCompany("Démo");
             player.setEmail("Démo");
-            player.setGenderMale(true);
+            player.setContact(true);
             player.setTwitter("Démo");
             internalStartGame(player);
         });

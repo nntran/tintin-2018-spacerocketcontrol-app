@@ -77,20 +77,20 @@
                 android:id="@+id/radio_group"
                 android:gravity="center_horizontal">
                 <RadioButton
-                    android:id="@+id/male"
+                    android:id="@+id/contact_yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/fab_margin"
-                    android:text="@string/male"
+                    android:text="@string/contact_yes"
                     android:layout_marginEnd="@dimen/fab_margin"
                     />
 
                 <RadioButton
-                    android:id="@+id/female"
+                    android:id="@+id/contact_no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/fab_margin"
-                    android:text="@string/female" />
+                    android:text="@string/contact_no" />
 
             </RadioGroup>
 

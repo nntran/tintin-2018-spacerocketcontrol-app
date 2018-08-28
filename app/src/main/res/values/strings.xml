@@ -6,7 +6,7 @@
     <string name="company">Société</string>
     <string name="twitter">Twitter</string>
     <string name="email">Email</string>
-    <string name="male">Homme</string>
-    <string name="female">Femme</string>
+    <string name="contact_yes">Contact</string>
+    <string name="contact_no">Pas contact</string>
     <string name="launch">Lancer le jeu</string>
 </resources>

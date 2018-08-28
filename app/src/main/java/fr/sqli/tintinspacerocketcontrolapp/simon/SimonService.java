@@ -108,7 +108,7 @@ public final class SimonService {
         gamer.gamerEmail = player.getEmail();
         gamer.gamerCompany = player.getCompany();
         gamer.gamerTwitter = player.getTwitter();
-        gamer.gamerGenderMale = player.isGenderMale();
+        gamer.gamerContact = player.isContact();
 
         return spaceRocketApi.start(gamer)
                 .subscribeOn(Schedulers.io())

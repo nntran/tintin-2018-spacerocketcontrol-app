@@ -13,7 +13,7 @@ public class AddPlayerActivity extends AppCompatActivity {
 
     public static String PLAYER_INFORMATION = "PLAYER_INFORMATION";
     private Player playerInformation;
-    private RadioButton male;
+    private RadioButton contact;
     private EditText twitter;
     private EditText company;
     private EditText email;
@@ -30,8 +30,8 @@ public class AddPlayerActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         company = findViewById(R.id.company);
         twitter = findViewById(R.id.twitter);
-        male = findViewById(R.id.male);
-        RadioButton female = findViewById(R.id.female);
+        contact = findViewById(R.id.contact_yes);
+        RadioButton female = findViewById(R.id.contact_no);
 
         if(getIntent().getExtras() != null){
             playerInformation = (Player) getIntent().getExtras().getSerializable(PLAYER_INFORMATION);
@@ -45,8 +45,8 @@ public class AddPlayerActivity extends AppCompatActivity {
         email.setText(playerInformation.getEmail());
         company.setText(playerInformation.getCompany());
         twitter.setText(playerInformation.getTwitter());
-        if (playerInformation.isGenderMale()) {
-            male.setChecked(true);
+        if (playerInformation.isContact()) {
+            contact.setChecked(true);
         } else {
             female.setChecked(true);
         }
@@ -66,7 +66,7 @@ public class AddPlayerActivity extends AppCompatActivity {
                 playerInformation.setLastName(lastName.getText().toString());
                 playerInformation.setFirstName(firstName.getText().toString());
                 playerInformation.setTwitter(twitter.getText().toString());
-                playerInformation.setGenderMale(male.isChecked());
+                playerInformation.setContact(contact.isChecked());
                 final Intent intent = new Intent();
                 intent.putExtra(PLAYER_INFORMATION, playerInformation);
                 setResult(RESULT_OK, intent);
