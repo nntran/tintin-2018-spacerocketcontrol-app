@@ -82,7 +82,7 @@
                     android:minWidth="0pt"
                     android:padding="0pt"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_simon_blue_button" />
+                    android:src="@drawable/simon_button_blue_src" />
             </LinearLayout>
 
             <LinearLayout
@@ -100,7 +100,7 @@
                     android:minWidth="0pt"
                     android:padding="0pt"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_simon_yellow_button" />
+                    android:src="@drawable/simon_button_yellow_src" />
             </LinearLayout>
 
             <LinearLayout
@@ -118,7 +118,7 @@
                     android:minWidth="0pt"
                     android:padding="0pt"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_simon_red_button" />
+                    android:src="@drawable/simon_button_red_src" />
             </LinearLayout>
 
             <LinearLayout
@@ -136,7 +136,7 @@
                     android:minWidth="0pt"
                     android:padding="0pt"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_simon_green_button" />
+                    android:src="@drawable/simon_button_green_src" />
             </LinearLayout>
 
         </LinearLayout>
