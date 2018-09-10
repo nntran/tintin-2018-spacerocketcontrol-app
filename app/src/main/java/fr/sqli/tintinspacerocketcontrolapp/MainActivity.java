@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int ZXING_CAMERA_PERMISSION = 1;
     private Player currentPlayer;
     private CurrentTry currentTry = null;
-    private Date startTryDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void internalGetScore(AlertDialog alertDialog) {
-        // TODO Récupération du score
         findViewById(R.id.scan_button).setEnabled(true);
         findViewById(R.id.add_player_manually).setEnabled(true);
         findViewById(R.id.play_demo).setEnabled(true);

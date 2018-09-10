@@ -138,7 +138,6 @@ public final class SimonService {
     }
 
     public Observable<PlayResult> play(final Player player) {
-        // TODO Gérer exception jeu terminé
         return spaceRocketApi.play(player.getId()).flatMap(play -> {
             final PlayResult playResult = new PlayResult();
             playResult.correctSequence = convertColorsCodesArrayToColorsList(play.sequence);
@@ -155,7 +154,6 @@ public final class SimonService {
         tryBody.time = time;
         tryBody.sequence = convertLEDColorsListToArray(sequenceTried);
 
-        // TODO Gérer exception jeu terminé
         return spaceRocketApi.trySequence(player.getId(), tryBody).flatMap(tryResponse -> {
             TryResult result = new TryResult();
             result.remainingAttempts = tryResponse.remainingAttempts;
