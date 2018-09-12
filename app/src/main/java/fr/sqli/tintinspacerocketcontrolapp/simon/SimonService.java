@@ -8,6 +8,7 @@ import com.squareup.moshi.Moshi;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
 import fr.sqli.tintinspacerocketcontrolapp.simon.api.Gamer;
@@ -24,6 +25,7 @@ import fr.sqli.tintinspacerocketcontrolapp.simon.pojos.TryResult;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -90,8 +92,16 @@ public final class SimonService {
     private void initSpaceRocketApi() {
         genericKoResponseJsonAdapter = new Moshi.Builder().build().adapter(GenericKoResponse.class);
 
+        final OkHttpClient httpClient = new OkHttpClient()
+                .newBuilder()
+                .readTimeout(1, TimeUnit.MINUTES)
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .writeTimeout(1, TimeUnit.MINUTES)
+                .build();
+
         spaceRocketApi = new Retrofit.Builder()
                 .baseUrl(serverUrl)
+                .client(httpClient)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build().create(SpaceRocketApi.class);

@@ -268,12 +268,14 @@ public class MainActivity extends AppCompatActivity {
             currentPlayer.setId(((PlayerAlreadyPlayedException) throwable).gamerId);
             internalGetScore(alertDialog);
         } else if (throwable instanceof HttpException) {
+            throwable.printStackTrace();
             final HttpException httpException = (HttpException) throwable;
             final String message = "Exception HTTP \n" + httpException.getMessage() + "\n" + httpException.response().errorBody().string();
             alertDialog.setMessage(message);
             alertDialog.show();
         } else {
-            final String message = throwable.getMessage();
+            throwable.printStackTrace();
+            final String message = throwable.getClass().getName() + "\n" + throwable.getMessage();
             alertDialog.setMessage(message);
             alertDialog.show();
         }
