@@ -1,5 +1,7 @@
 package fr.sqli.tintinspacerocketcontrolapp.simon.api;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -22,4 +24,12 @@ public interface SpaceRocketApi {
 
     @GET("/simon/{id}/score")
     Observable<Score> getScore(@Path("id") final int gamerId);
+
+    @GET("/simon/scores")
+    Observable<List<Gamer>> getScores(@Path("date") final String date);
+
+    @POST("/simon/{id}/stop")
+    Observable<Boolean> stop(@Path("id") final int gamerId);
+
+
 }
