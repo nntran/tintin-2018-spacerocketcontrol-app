@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import fr.sqli.tintinspacerocketcontrolapp.player.AddPlayerActivity;
 import fr.sqli.tintinspacerocketcontrolapp.player.Player;
@@ -240,7 +242,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.add_player_manually).setEnabled(true);
         findViewById(R.id.play_demo).setEnabled(true);
         SimonService.getInstance(this).getScore(currentPlayer).subscribe(score -> {
-            final String message = "Partie terminée ! \n\n Ton score est de " + score.score + " (temps total " + score.time +")";
+            String strTime = String.format(Locale.FRANCE, "%01d min, %02d sec",
+                    TimeUnit.MILLISECONDS.toMinutes(score.time),
+                    TimeUnit.MILLISECONDS.toSeconds(score.time) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(score.time)));
+            final String message = "Partie terminée ! \n\n Ton score est de " + score.score + " (temps total " + strTime +")";
             alertDialog.setMessage(message);
             alertDialog.show();
         }, throwable1 -> {
