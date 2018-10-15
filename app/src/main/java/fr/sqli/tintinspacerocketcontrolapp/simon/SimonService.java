@@ -123,7 +123,7 @@ public final class SimonService {
     public Observable<Start> start(final Player player) {
         final Gamer gamer = new Gamer();
         gamer.gamerFirstname = player.getFirstName();
-        gamer.gamerLastname = player.getFirstName();
+        gamer.gamerLastname = player.getLastName();
         gamer.gamerEmail = player.getEmail();
         gamer.gamerCompany = player.getCompany();
         gamer.gamerTwitter = player.getTwitter();
